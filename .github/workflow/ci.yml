@@ -1,0 +1,33 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+      
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: |
+          terraform init -backend=false
+          terraform validate ./terraform
+
+      - name: install Ansible Lint
+        run: |
+          sudo apt update
+          sudo apt install -y ansible-lint
+
+      - name: Run Ansible Lint
+        run: ansible-lint
